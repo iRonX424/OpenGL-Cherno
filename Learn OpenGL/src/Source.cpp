@@ -140,7 +140,7 @@ int main(void)
 
     /* Make the window's context current */
     glfwMakeContextCurrent(window);
-    glfwSwapInterval(1);
+    glfwSwapInterval(10);
 
     if (glewInit() != GLEW_OK)
         std::cout << "Error initializing GLEW" << std::endl;
@@ -164,20 +164,20 @@ int main(void)
     unsigned int buffer;
     GLCheckError(glGenBuffers(1, &buffer));
     GLCheckError(glBindBuffer(GL_ARRAY_BUFFER, buffer));
-    GLCheckError(glBufferData(GL_ARRAY_BUFFER, 5 * sizeof(float) * 4  , vertices, GL_STATIC_DRAW));
+    GLCheckError(glBufferData(GL_ARRAY_BUFFER, 5 * sizeof(float) * 4, vertices, GL_STATIC_DRAW));
 
     //for the indices array
     unsigned int indexBuffer;
     GLCheckError(glGenBuffers(1, &indexBuffer));
     GLCheckError(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indexBuffer));
-    GLCheckError(glBufferData(GL_ELEMENT_ARRAY_BUFFER, 6 * sizeof(unsigned int) , indices, GL_STATIC_DRAW));
+    GLCheckError(glBufferData(GL_ELEMENT_ARRAY_BUFFER, 6 * sizeof(unsigned int), indices, GL_STATIC_DRAW));
 
     //for vertex positions
     GLCheckError(glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 5, 0));
     GLCheckError(glEnableVertexAttribArray(0));
 
     //for vertex colors
-    GLCheckError(glVertexAttribPointer(1,3,GL_FLOAT,GL_FALSE,5*sizeof(float),(void*)(2*sizeof(float))));
+    GLCheckError(glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(2 * sizeof(float))));
     GLCheckError(glEnableVertexAttribArray(1));
 
     Shaders shaders = GetShaderSource("resources\\shaders\\BasicShader.shader");
@@ -185,72 +185,27 @@ int main(void)
     glUseProgram(shader);
 
     //uniforms
-    //int uniformLocation = glGetUniformLocation(shader, "translateVal");
-    //ASSERT(uniformLocation != -1);
-
-    //int rotation = glGetUniformLocation(shader, "rotate");
-    //ASSERT(uniformLocation != -1);
-    //
-    //float b = 0.5f;
-    //float increment = 0.01f;
-
-    ////uniform for scaling
-    //int uniformScaleLocation = glGetUniformLocation(shader,"u_ScaleValues");
-    //ASSERT(uniformScaleLocation!=-1);
-
-    //int count = 0;
-    //float x = 0.01f;
-    //float y = 0.01f;
-
+    GLCheckError(int location = glGetUniformLocation(shader, "u_Color"));
+    ASSERT(location != -1);
+    
+    float redChannel = 0.f;
+    float increment = 0.1f;
     /* Loop until the user closes the window */
     while (!glfwWindowShouldClose(window))
     {
         /* Render here */
         glClear(GL_COLOR_BUFFER_BIT);
+        
+        if (redChannel > 1.f)
+            increment = -0.1f;
+        else if (redChannel < 0.f)
+            increment = +0.1f;
 
-        //HandleKeyboardInput(window);
-        //int keyw = glfwGetKey(window, GLFW_KEY_W);
-        //if (keyw == GLFW_PRESS)
-        //{
-        //    //std::cout << keyw << "Ara Ara" << count << std::endl;
-        //    //++count;
-        //    y = y + 0.01f;
-        //    //glUniform4f(uniformLocation, std::cos(b), f, b, 1.0f);
-        //}
-        //int keys = glfwGetKey(window, GLFW_KEY_S);
-        //if (keys == GLFW_PRESS)
-        //{
-        //    //std::cout << keys << "Ara Ara" << count << std::endl;
-        //    //++count;
-        //    y = y - 0.01f;
-        //    //glUniform4f(uniformLocation, std::cos(b), f, b, 1.0f);
-        //}
-        //int keya = glfwGetKey(window, GLFW_KEY_A);
-        //if (keya == GLFW_PRESS)
-        //{
-        //    //std::cout << keyw << "Ara Ara" << count << std::endl;
-        //    //++count;
-        //    x = x - 0.01f;
-        //    //glUniform4f(uniformLocation, std::cos(b), f, b, 1.0f);
-        //}
-        //int keyd = glfwGetKey(window, GLFW_KEY_D);
-        //if (keyd == GLFW_PRESS)
-        //{
-        //    //std::cout << keyw << "Ara Ara" << count << std::endl;
-        //    //++count;
-        //    x = x + 0.01f;
-        //    //glUniform4f(uniformLocation, std::cos(b), f, b, 1.0f);
-        //}
-        //glUniform3f(uniformLocation, x,y,0.0f);
-        //GLCheckError(glUniform4f(uniformLocation, std::cos(b), std::sin(b), b, 1.0f));
-        GLCheckError(glDrawElements(GL_TRIANGLES, 6,GL_UNSIGNED_INT,(void*)0));
-        //glDrawArrays(GL_QUADS,0,4*5);
-        /*if (b > 1.0f)
-            increment = -0.01f;
-        else if (b < 0.0f)
-            increment = 0.01f;
+        redChannel += increment;
+        std::cout << "redChannel: " << redChannel << std::endl;
 
-        b = b + increment;*/
+        GLCheckError(glUniform4f(location, redChannel, 0.5f, 0.8f, 1.f));
+        GLCheckError(glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, (void*)0));
 
         /* Swap front and back buffers */
         glfwSwapBuffers(window);
@@ -263,4 +218,4 @@ int main(void)
 
     glfwTerminate();
     return 0;
-}
+};
