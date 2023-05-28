@@ -5,41 +5,11 @@
 #include <string>
 #include <fstream>
 #include <sstream>
+
 #include "Source.h"
-
-#define ASSERT(x) if(!(x)) __debugbreak();
-#define GLCheckError(x) GLClearErrors();\
-    x;\
-    ASSERT(GLLogCall(#x,__FILE__,__LINE__))
-
-#if 0
-int count = 0;
-
-void HandleKeyboardInput(GLFWwindow * window)
-{
-    int key = glfwGetKey(window, GLFW_KEY_W);
-    if (key == GLFW_PRESS)
-    {
-        std::cout << key << "Ara Ara" << count << std::endl;
-        ++count;
-    }
-}
-#endif
-static void GLClearErrors()
-{
-    while (glGetError() != GL_NO_ERROR);
-}
-
-static bool GLLogCall(const char* function, const char* file,int line)
-{
-    while (GLenum errors = glGetError())
-    {
-        std::cout << "[Opengl Error]  " << function <<
-            "\n\t\t"<<file<< "\n\t\tLine : " << line << std::endl;
-        return false;
-    }
-    return true;
-}
+#include "Renderer.h"
+#include "VertexBuffer.h"
+#include "IndexBuffer.h"
 
 struct Shaders
 {
@@ -146,76 +116,67 @@ int main(void)
         std::cout << "Error initializing GLEW" << std::endl;
 
     std::cout << glGetString(GL_VERSION) << std::endl;
-
-    float vertices[] = {    //anti clockwise
-                           // 2-position      3-color
-                            -0.5f, -0.5f,  1.0f,0.0f,0.0f,   //bottom left
-                             0.5f, -0.5f,  0.0f,1.0f,0.0f,   //bottom right
-                             0.5f,  0.5f,  0.0f,0.0f,1.0f,   //top right
-                            -0.5f,  0.5f,  0.0f,1.0f,0.0f    //top left
-    };
-
-    unsigned int indices[] = {
-            0,1,2,
-            0,2,3
-    };
-
-    //for the vertices array
-    unsigned int buffer;
-    GLCheckError(glGenBuffers(1, &buffer));
-    GLCheckError(glBindBuffer(GL_ARRAY_BUFFER, buffer));
-    GLCheckError(glBufferData(GL_ARRAY_BUFFER, 5 * sizeof(float) * 4, vertices, GL_STATIC_DRAW));
-
-    //for the indices array
-    unsigned int indexBuffer;
-    GLCheckError(glGenBuffers(1, &indexBuffer));
-    GLCheckError(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indexBuffer));
-    GLCheckError(glBufferData(GL_ELEMENT_ARRAY_BUFFER, 6 * sizeof(unsigned int), indices, GL_STATIC_DRAW));
-
-    //for vertex positions
-    GLCheckError(glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 5, 0));
-    GLCheckError(glEnableVertexAttribArray(0));
-
-    //for vertex colors
-    GLCheckError(glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(2 * sizeof(float))));
-    GLCheckError(glEnableVertexAttribArray(1));
-
-    Shaders shaders = GetShaderSource("resources\\shaders\\BasicShader.shader");
-    unsigned int shader = CreateShader(shaders.VertexShader, shaders.FragmentShader);
-    glUseProgram(shader);
-
-    //uniforms
-    GLCheckError(int location = glGetUniformLocation(shader, "u_Color"));
-    ASSERT(location != -1);
-    
-    float redChannel = 0.f;
-    float increment = 0.1f;
-    /* Loop until the user closes the window */
-    while (!glfwWindowShouldClose(window))
     {
-        /* Render here */
-        glClear(GL_COLOR_BUFFER_BIT);
-        
-        if (redChannel > 1.f)
-            increment = -0.1f;
-        else if (redChannel < 0.f)
-            increment = +0.1f;
+        float vertices[] = {    //anti clockwise
+                               // 2-position      3-color
+                                -0.5f, -0.5f,  1.0f,0.0f,0.0f,   //bottom left
+                                 0.5f, -0.5f,  0.0f,1.0f,0.0f,   //bottom right
+                                 0.5f,  0.5f,  0.0f,0.0f,1.0f,   //top right
+                                -0.5f,  0.5f,  0.0f,1.0f,0.0f    //top left
+        };
 
-        redChannel += increment;
-        std::cout << "redChannel: " << redChannel << std::endl;
+        unsigned int indices[] = {
+                0,1,2,
+                0,2,3
+        };
 
-        GLCheckError(glUniform4f(location, redChannel, 0.5f, 0.8f, 1.f));
-        GLCheckError(glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, (void*)0));
+        VertexBuffer vertexBuffer(vertices, 5 * sizeof(float) * 4);
 
-        /* Swap front and back buffers */
-        glfwSwapBuffers(window);
+        IndexBuffer indexBuffer(indices, 6);
 
-        /* Poll for and process events */
-        glfwPollEvents();
+        //for vertex positions
+        GLCheckError(glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 5, 0));
+        GLCheckError(glEnableVertexAttribArray(0));
+
+        //for vertex colors
+        GLCheckError(glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(2 * sizeof(float))));
+        GLCheckError(glEnableVertexAttribArray(1));
+
+        Shaders shaders = GetShaderSource("resources\\shaders\\BasicShader.shader");
+        unsigned int shader = CreateShader(shaders.VertexShader, shaders.FragmentShader);
+        glUseProgram(shader);
+
+        //uniforms
+        GLCheckError(int location = glGetUniformLocation(shader, "u_Color"));
+        ASSERT(location != -1);
+
+        float redChannel = 0.f;
+        float increment = 0.1f;
+        /* Loop until the user closes the window */
+        while (!glfwWindowShouldClose(window))
+        {
+            /* Render here */
+            glClear(GL_COLOR_BUFFER_BIT);
+
+            if (redChannel > 1.f)
+                increment = -0.1f;
+            else if (redChannel < 0.f)
+                increment = +0.1f;
+
+            redChannel += increment;
+
+            GLCheckError(glUniform4f(location, redChannel, 0.5f, 0.8f, 1.f));
+            GLCheckError(glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, (void*)0));
+
+            /* Swap front and back buffers */
+            glfwSwapBuffers(window);
+
+            /* Poll for and process events */
+            glfwPollEvents();
+        }
+
+        glDeleteProgram(shader);
     }
-
-    glDeleteProgram(shader);
-
     glfwTerminate();
     return 0;
 };
