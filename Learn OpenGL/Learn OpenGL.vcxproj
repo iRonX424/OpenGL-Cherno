@@ -94,7 +94,7 @@
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>$(SolutionDir)Dependencies\Glew\lib\Release\Win32;$(SolutionDir)Dependencies\GLFW\lib-vc2019;$(SolutionDir)Dependencies\Glew\lib\Release\Win32;$(SolutionDir)Dependencies\GLFW\lib-vc2019;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>glfw3.lib;opengl32.lib;glew32s.lib;%(AdditionalDependencies);glfw3.lib;opengl32.lib;gdi32.lib;shell32.lib;user32.lib;glfw3.lib;opengl32.lib;user32.lib;gdi32.lib;shell32.lib</AdditionalDependencies>
+      <AdditionalDependencies>/NODEFAULTLIB:MSVCRT;/NODEFAULTLIB:library;glfw3.lib;opengl32.lib;glew32s.lib;%(AdditionalDependencies);glfw3.lib;opengl32.lib;gdi32.lib;shell32.lib;user32.lib;glfw3.lib;opengl32.lib;user32.lib;gdi32.lib;shell32.lib</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -113,7 +113,7 @@
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>$(SolutionDir)Dependencies\Glew\lib\Release\Win32;$(SolutionDir)Dependencies\GLFW\lib-vc2019;$(SolutionDir)Dependencies\Glew\lib\Release\Win32;$(SolutionDir)Dependencies\GLFW\lib-vc2019;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>glfw3.lib;opengl32.lib;glew32s.lib;%(AdditionalDependencies);glfw3.lib;opengl32.lib;gdi32.lib;shell32.lib;user32.lib;glfw3.lib;opengl32.lib;user32.lib;gdi32.lib;shell32.lib</AdditionalDependencies>
+      <AdditionalDependencies>/NODEFAULTLIB:MSVCRT;/NODEFAULTLIB:library;glfw3.lib;opengl32.lib;glew32s.lib;%(AdditionalDependencies);glfw3.lib;opengl32.lib;gdi32.lib;shell32.lib;user32.lib;glfw3.lib;opengl32.lib;user32.lib;gdi32.lib;shell32.lib</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -128,7 +128,7 @@
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>$(SolutionDir)Dependencies\Glew\lib\Release\Win32;$(SolutionDir)Dependencies\GLFW\lib-vc2019;</AdditionalLibraryDirectories>
-      <AdditionalDependencies>$(CoreLibraryDependencies);%(AdditionalDependencies);glfw3.lib;opengl32.lib;gdi32.lib;shell32.lib;user32.lib;glfw3.lib;opengl32.lib;user32.lib;gdi32.lib;shell32.lib</AdditionalDependencies>
+      <AdditionalDependencies>/NODEFAULTLIB:MSVCRT;/NODEFAULTLIB:library;$(CoreLibraryDependencies);%(AdditionalDependencies);glfw3.lib;opengl32.lib;gdi32.lib;shell32.lib;user32.lib;glfw3.lib;opengl32.lib;user32.lib;gdi32.lib;shell32.lib</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -147,7 +147,7 @@
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>$(SolutionDir)Dependencies\Glew\lib\Release\Win32;$(SolutionDir)Dependencies\GLFW\lib-vc2019;</AdditionalLibraryDirectories>
-      <AdditionalDependencies>$(CoreLibraryDependencies);%(AdditionalDependencies);glfw3.lib;opengl32.lib;gdi32.lib;shell32.lib;user32.lib;glfw3.lib;opengl32.lib;user32.lib;gdi32.lib;shell32.lib</AdditionalDependencies>
+      <AdditionalDependencies>/NODEFAULTLIB:MSVCRT;/NODEFAULTLIB:library;$(CoreLibraryDependencies);%(AdditionalDependencies);glfw3.lib;opengl32.lib;gdi32.lib;shell32.lib;user32.lib;glfw3.lib;opengl32.lib;user32.lib;gdi32.lib;shell32.lib</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
