@@ -10,6 +10,7 @@
 #include "Renderer.h"
 #include "VertexBuffer.h"
 #include "IndexBuffer.h"
+#include "VertexArray.h"
 
 struct Shaders
 {
@@ -125,6 +126,14 @@ int main(void)
                                 -0.5f,  0.5f,  0.0f,1.0f,0.0f    //top left
         };
 
+        //float vertices[] = {    //anti clockwise
+        //    // 2-position      
+        //     -0.5f, -0.5f,     //bottom left
+        //      0.5f, -0.5f,     //bottom right
+        //      0.5f,  0.5f,     //top right
+        //     -0.5f,  0.5f,     //top left
+        //};
+
         unsigned int indices[] = {
                 0,1,2,
                 0,2,3
@@ -134,13 +143,21 @@ int main(void)
 
         IndexBuffer indexBuffer(indices, 6);
 
-        //for vertex positions
-        GLCheckError(glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 5, 0));
-        GLCheckError(glEnableVertexAttribArray(0));
 
-        //for vertex colors
-        GLCheckError(glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(2 * sizeof(float))));
-        GLCheckError(glEnableVertexAttribArray(1));
+        VertexArray va;
+        VertexBufferLayout layout;
+        layout.Push<float>(2);
+        layout.Push<float>(3);
+        va.AddBuffer(vertexBuffer, layout);
+
+
+        ////for vertex positions
+        //GLCheckError(glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 5, 0));
+        //GLCheckError(glEnableVertexAttribArray(0));
+
+        ////for vertex colors
+        //GLCheckError(glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(2 * sizeof(float))));
+        //GLCheckError(glEnableVertexAttribArray(1));
 
         Shaders shaders = GetShaderSource("resources\\shaders\\BasicShader.shader");
         unsigned int shader = CreateShader(shaders.VertexShader, shaders.FragmentShader);
@@ -164,6 +181,9 @@ int main(void)
                 increment = +0.1f;
 
             redChannel += increment;
+
+            va.Bind();
+            indexBuffer.Bind();
 
             GLCheckError(glUniform4f(location, redChannel, 0.5f, 0.8f, 1.f));
             GLCheckError(glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, (void*)0));

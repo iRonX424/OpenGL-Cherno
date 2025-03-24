@@ -22,5 +22,5 @@ uniform vec4 u_Color;
 
 void main()
 {
-	color = u_Color;//vec4(vertexcolor, 1.0);
+	color = /* u_Color; */vec4(vertexcolor, 1.0);
 };
