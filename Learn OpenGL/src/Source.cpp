@@ -11,87 +11,7 @@
 #include "VertexBuffer.h"
 #include "IndexBuffer.h"
 #include "VertexArray.h"
-
-struct Shaders
-{
-    std::string VertexShader;
-    std::string FragmentShader;
-};
-
-static Shaders GetShaderSource(const std::string& filepath)
-{
-    std::ifstream inputStream(filepath);
-
-
-    enum class Shadertype
-    {
-        None = -1, Vertex = 0, Fragment = 1
-    };
-
-    Shadertype type = Shadertype::Vertex;
-    std::stringstream ss[2];
-    std::string line;
-    while (getline(inputStream, line))
-    {
-        if (line.find("#shader") != std::string::npos)
-        {
-            if (line.find("vertex") != std::string::npos)
-                type = Shadertype::Vertex;
-            else if (line.find("fragment") != std::string::npos)
-                type = Shadertype::Fragment;
-        }
-        else
-        {
-            ss[(int)type] << line << '\n';
-        }
-    }
-    return { ss[0].str(), ss[1].str() };
-}
-
-static unsigned int CompileShader(const std::string& source, unsigned int type)
-{
-    unsigned int shader = glCreateShader(type);
-    const char* src = &source[0];
-    GLCheckError(glShaderSource(shader, 1, &src, nullptr));
-    glCompileShader(shader);
-
-    //error handling
-    int result;
-    GLCheckError(glGetShaderiv(shader, GL_COMPILE_STATUS, &result));
-    if (!result)
-    {
-        int msgLength;
-        glGetShaderiv(shader, GL_INFO_LOG_LENGTH, &msgLength);
-        char* errorMsg = (char*)malloc(msgLength * sizeof(char));
-        glGetShaderInfoLog(shader, msgLength, &msgLength, errorMsg);
-        std::cout << "Error creating " <<
-            (type == GL_VERTEX_SHADER ? "Vertex Shader." : "Fragment Shader.") << std::endl;
-        std::cout << errorMsg << std::endl;
-
-        free(errorMsg);
-        glDeleteShader(shader);
-        return 0;
-    }
-
-    return shader;
-}
-
-static unsigned int CreateShader(const std::string& vertexShader, const std::string& fragmentShader)
-{
-    unsigned int program = glCreateProgram();
-    unsigned int vs = CompileShader(vertexShader, GL_VERTEX_SHADER);
-    unsigned int fs = CompileShader(fragmentShader, GL_FRAGMENT_SHADER);
-
-    glAttachShader(program, vs);
-    glAttachShader(program, fs);
-    glLinkProgram(program);
-    glValidateProgram(program);
-
-    glDeleteShader(vs);
-    glDeleteShader(fs);
-
-    return program;
-}
+#include "Shader.h"
 
 int main(void)
 {
@@ -144,11 +64,11 @@ int main(void)
         IndexBuffer indexBuffer(indices, 6);
 
 
-        VertexArray va;
+        VertexArray vertexArray;
         VertexBufferLayout layout;
         layout.Push<float>(2);
         layout.Push<float>(3);
-        va.AddBuffer(vertexBuffer, layout);
+        vertexArray.AddBuffer(vertexBuffer, layout);
 
 
         ////for vertex positions
@@ -159,21 +79,16 @@ int main(void)
         //GLCheckError(glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(2 * sizeof(float))));
         //GLCheckError(glEnableVertexAttribArray(1));
 
-        Shaders shaders = GetShaderSource("resources\\shaders\\BasicShader.shader");
-        unsigned int shader = CreateShader(shaders.VertexShader, shaders.FragmentShader);
-        glUseProgram(shader);
+        Shader shader = Shader("resources\\shaders\\BasicShader.shader");
 
-        //uniforms
-        GLCheckError(int location = glGetUniformLocation(shader, "u_Color"));
-        ASSERT(location != -1);
+        Renderer renderer;
 
         float redChannel = 0.f;
         float increment = 0.1f;
         /* Loop until the user closes the window */
         while (!glfwWindowShouldClose(window))
         {
-            /* Render here */
-            glClear(GL_COLOR_BUFFER_BIT);
+            renderer.Clear();
 
             if (redChannel > 1.f)
                 increment = -0.1f;
@@ -182,20 +97,22 @@ int main(void)
 
             redChannel += increment;
 
-            va.Bind();
-            indexBuffer.Bind();
+            shader.Bind();
+            shader.SetUniform4f("u_Color", redChannel, 0.5f, 0.8f, 1.f);
 
-            GLCheckError(glUniform4f(location, redChannel, 0.5f, 0.8f, 1.f));
-            GLCheckError(glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, (void*)0));
+            //vertexArray.Bind();
+            //indexBuffer.Bind();
 
-            /* Swap front and back buffers */
+            //GLCheckError(glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, (void*)0));
+            renderer.Draw(vertexArray, indexBuffer, shader);
             glfwSwapBuffers(window);
-
-            /* Poll for and process events */
             glfwPollEvents();
         }
 
-        glDeleteProgram(shader);
+        vertexArray.Unbind();
+        vertexBuffer.Unbind();
+        indexBuffer.Unbind();
+        shader.Unbind();
     }
     glfwTerminate();
     return 0;

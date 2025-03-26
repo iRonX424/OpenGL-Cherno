@@ -9,3 +9,14 @@
 
 void GLClearErrors();
 bool GLLogCall(const char* function, const char* file, int line);
+
+class VertexArray;
+class IndexBuffer;
+class Shader;
+
+class Renderer
+{
+public:
+    void Draw(const VertexArray& vertexArray, const IndexBuffer& indexBuffer, const Shader& shader) const;
+    void Clear() const;
+};
